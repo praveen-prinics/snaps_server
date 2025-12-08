@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Printer Status Dashboard</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+  }
+  .row {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  .printer {
+    flex: 1;
+    border: 1px solid #ccc;
+    padding: 15px;
+    border-radius: 8px;
+    max-width: 400px;
+  }
+  .printer h2 {
+    margin-top: 0;
+  }
+  .status {
+    margin: 10px 0;
+  }
+  input[type="number"] {
+    width: 80px;
+    padding: 4px;
+  }
+  button {
+    padding: 8px 12px;
+    margin-top: 10px;
+    margin-right: 10px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+
+<h1>Printer Status Dashboard</h1>
+
+<div class="row">
+  <div class="printer" id="printer1" data-printer-id="1">
+    <h2>Printer 1</h2>
+    <div class="status">
+      Ribbon Count: <input type="number" id="ribbon1" min="0" />
+    </div>
+    <div class="status">
+      Paper Count: <input type="number" id="paper1" min="0" />
+    </div>
+    <button onclick="saveCounts(1)">Save</button>
+    <button onclick="resetRibbon(1)">Reset Ribbon</button>
+    <button onclick="resetPaper(1)">Reset Paper</button>
+  </div>
+
+  <div class="printer" id="printer2" data-printer-id="2">
+    <h2>Printer 2</h2>
+    <div class="status">
+      Ribbon Count: <input type="number" id="ribbon2" min="0" />
+    </div>
+    <div class="status">
+      Paper Count: <input type="number" id="paper2" min="0" />
+    </div>
+    <button onclick="saveCounts(2)">Save</button>
+    <button onclick="resetRibbon(2)">Reset Ribbon</button>
+    <button onclick="resetPaper(2)">Reset Paper</button>
+  </div>
+</div>
+
+<div class="row">
+  <div class="printer" id="printer3" data-printer-id="3">
+    <h2>Printer 3</h2>
+    <div class="status">
+      Ribbon Count: <input type="number" id="ribbon3" min="0" />
+    </div>
+    <div class="status">
+      Paper Count: <input type="number" id="paper3" min="0" />
+    </div>
+    <button onclick="saveCounts(3)">Save</button>
+    <button onclick="resetRibbon(3)">Reset Ribbon</button>
+    <button onclick="resetPaper(3)">Reset Paper</button>
+  </div>
+
+  <div class="printer" id="printer4" data-printer-id="4">
+    <h2>Printer 4</h2>
+    <div class="status">
+      Ribbon Count: <input type="number" id="ribbon4" min="0" />
+    </div>
+    <div class="status">
+      Paper Count: <input type="number" id="paper4" min="0" />
+    </div>
+    <button onclick="saveCounts(4)">Save</button>
+    <button onclick="resetRibbon(4)">Reset Ribbon</button>
+    <button onclick="resetPaper(4)">Reset Paper</button>
+  </div>
+</div>
+
+<script>
+  const API_BASE_URL = '/printers';
+
+  // Function to load current counts for all printers
+  async function loadPrinterCounts() {
+    const printers = document.querySelectorAll('.printer');
+    for (const printerDiv of printers) {
+      const printerId = printerDiv.getAttribute('data-printer-id');
+      try {
+        const response = await fetch(`${API_BASE_URL}/${printerId}`);
+        if (!response.ok) {
+          throw new Error(`Failed to fetch data for printer ${printerId}`);
+        }
+        const data = await response.json();
+        document.getElementById(`ribbon${printerId}`).value = data.ribbon;
+        document.getElementById(`paper${printerId}`).value = data.paper;
+      } catch (error) {
+        console.error(error);
+        alert(`Error loading data for Printer ${printerId}`);
+      }
+    }
+  }
+
+  // Save counts to API
+  async function saveCounts(printerId) {
+    const ribbon = document.getElementById(`ribbon${printerId}`).value;
+    const paper = document.getElementById(`paper${printerId}`).value;
+    try {
+      const response = await fetch(`${API_BASE_URL}/${printerId}`, {
+        method: 'PUT', // or 'PUT' based on your API
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ ribbon: Number(ribbon), paper: Number(paper) })
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to save data for printer ${printerId}`);
+      }
+      alert(`Printer ${printerId} counts saved successfully.`);
+    } catch (error) {
+      console.error(error);
+      alert(`Error saving data for Printer ${printerId}`);
+    }
+  }
+
+  // Reset counts to current API values or defaults
+  async function resetCounts(printerId) {
+    try {
+      const response = await fetch(`${API_BASE_URL}/${printerId}`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch data for reset for printer ${printerId}`);
+      }
+      const data = await response.json();
+      document.getElementById(`ribbon${printerId}`).value = data.ribbon;
+      document.getElementById(`paper${printerId}`).value = data.paper;
+    } catch (error) {
+      console.error(error);
+      alert(`Error resetting data for Printer ${printerId}`);
+    }
+  }
+
+    async function resetRibbon(printerId) {
+      document.getElementById(`ribbon${printerId}`).value = 40;
+    }
+
+    async function resetPaper(printerId) {
+      document.getElementById(`paper${printerId}`).value = 20;
+    }
+
+  // Load all printer counts on page load
+  window.onload = loadPrinterCounts;
+</script>
+
+</body>
+</html>
