@@ -15,7 +15,7 @@ app.use(express.json());
     { id: 4, enabled: true, ribbon: 10, paper: 10 },
 ]*/
 
-const iniFile = './print_count.ini';
+const iniFile = __dirname+'/print_count.ini';
 let printers = ini.parse(fs.readFileSync(iniFile, 'utf-8'));
 
 app.get('/printers', (req, res) => {
