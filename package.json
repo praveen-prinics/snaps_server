@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/praveen-prinics/snaps_server#readme",
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "ini": "^6.0.0"
   }
 }
